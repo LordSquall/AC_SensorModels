@@ -1,2 +1,2 @@
-# AC_SensorModel_Altimeter
+# AC_SensorModels
 Application to simulate Altimeter sensor reading
