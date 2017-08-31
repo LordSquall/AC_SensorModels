@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sensor>
+	<name>Altimeter</name>
+	<input samplerate="10" />
+	
+	<output>
+		<bounds lower="0" upper="50000" />
+	</output>
+	
+	<network ipaddress="127.0.0.1" port="8100" />
+	
+</sensor>

@@ -17,5 +17,18 @@ include_directories("${PROJECT_BINARY_DIR}")
 
 # add the executable
 add_executable(AC_SensorModels
+src/tinyxml2/tinyxml2.cpp
 src/main.cpp
+src/timer.cpp
+src/sensors/sensor.cpp
+src/sensors/altimeter.cpp
+)
+
+source_group("sensors" FILES
+src/sensors/sensor.cpp
+src/sensors/altimeter.cpp
+)
+
+source_group("tinyxml2" FILES
+src/tinyxml2/tinyxml2.cpp
 )
