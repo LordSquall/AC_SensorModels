@@ -6,13 +6,13 @@
 #include <thread>
 #include <stdio.h>
 #include <winsock2.h>
+#include <WS2tcpip.h>
 
 /* Libraries */
 #pragma comment(lib, "ws2_32.lib")
 
 /* Local project includes */
 #include "sensors\sensor.h"
-#include "sensors\altimeter.h"
 #include "tinydir\tinydir.h"
 #include "tinyxml2\tinyxml2.h"
 
@@ -23,7 +23,7 @@ namespace AC_SensorModels
 	public:
 		Framework();
 
-		bool Initialise();
+		bool Initialise(char* dataDirectory);
 		bool Frame();
 
 	private:

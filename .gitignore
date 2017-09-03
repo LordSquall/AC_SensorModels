@@ -1,2 +1,4 @@
 /cmakeBuild
 *.TMP
+*.exe
+release

@@ -7,7 +7,7 @@ namespace AC_SensorModels
 
 	}
 
-	bool Framework::Initialise()
+	bool Framework::Initialise(char* dataDirectory)
 	{
 		/* Local variables */
 		bool result = false;
@@ -23,7 +23,7 @@ namespace AC_SensorModels
 		QueryPerformanceCounter((LARGE_INTEGER*)&frameworkStartTime);
 
 		/* Process the data directory to build data set */
-		result = ProcessDataDirectory("../data/sensors");
+		result = ProcessDataDirectory(dataDirectory);
 		if (result == false)
 		{
 			return result;
@@ -56,7 +56,7 @@ namespace AC_SensorModels
 			memset((char *)&sensor->socketAddr, 0, sizeof(sensor->socketAddr));
 			sensor->socketAddr.sin_family = AF_INET;
 			sensor->socketAddr.sin_port = htons(sensor->destinationPort);
-			sensor->socketAddr.sin_addr.S_un.S_addr = inet_addr(sensor->destinationIPAddress);
+			InetPton(AF_INET, sensor->destinationIPAddress, &sensor->socketAddr.sin_addr);
 						
 			/* Create Threads for each sensor */
 			std::thread* thread = new std::thread(&Framework::SensorFunction, this, sensor);

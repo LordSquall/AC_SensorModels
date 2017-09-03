@@ -19,14 +19,13 @@ include_directories("${PROJECT_BINARY_DIR}")
 add_executable(AC_SensorModels
 src/tinyxml2/tinyxml2.cpp
 src/main.cpp
-src/timer.cpp
+src/framework.cpp
 src/sensors/sensor.cpp
-src/sensors/altimeter.cpp
 )
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT AC_SensorModels)
 
 source_group("sensors" FILES
 src/sensors/sensor.cpp
-src/sensors/altimeter.cpp
 )
 
 source_group("tinyxml2" FILES
