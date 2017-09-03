@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sensor enabled="false">
+<sensor enabled="true">
 	<name>Variometer</name>
 	<input samplerate="100" />
 	
 	<!-- Modes: CLAMP = 0 | LOOP = 1 | BOUNCE = 2 -->
 	<output mode="0">
-		<bounds lower="0" upper="50000" />
+		<bounds lower="0" upper="3000" />
 	</output>
 	
 	<network ipaddress="127.0.0.1" port="8102" />

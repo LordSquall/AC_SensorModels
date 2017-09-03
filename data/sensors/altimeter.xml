@@ -4,7 +4,7 @@
 	<input samplerate="100" />
 	
 	<!-- Modes: CLAMP = 0 | LOOP = 1 | BOUNCE = 2 -->
-	<output mode="2">
+	<output mode="1">
 		<bounds lower="0" upper="1000" />
 	</output>
 	
