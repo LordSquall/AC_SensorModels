@@ -32,6 +32,10 @@ namespace AC_SensorModels
 		void SensorFunction(Sensor* sensor);
 
 	private:
+		INT64 frequency;
+		float ticksPerSecond;
+		INT64 frameworkStartTime;
+
 		std::vector<Sensor*> _sensors;
 		std::vector<std::thread> _threadHandles;
 		WSADATA _wsa;

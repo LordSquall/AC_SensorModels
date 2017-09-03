@@ -1,4 +1,3 @@
-
 /* system includes */
 #include <stdio.h>
 #include <ctime>
@@ -30,8 +29,8 @@ int main()
 
 	while (running == true)
 	{
-		/* Run framework frame */
-		running = framework->Frame();
+		/* Update framework timings */
+		framework->Frame();
 	}
 	float currentTime = 0.0f;
 

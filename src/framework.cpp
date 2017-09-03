@@ -12,6 +12,16 @@ namespace AC_SensorModels
 		/* Local variables */
 		bool result = false;
 
+		/* Initialise timing functions */
+		/* Get system class frequency */
+		QueryPerformanceFrequency((LARGE_INTEGER*)&frequency);
+
+		/* Work out clock ticks per second */
+		ticksPerSecond = (float)(frequency / 1000);
+
+		/* Get the start time for the framework */
+		QueryPerformanceCounter((LARGE_INTEGER*)&frameworkStartTime);
+
 		/* Process the data directory to build data set */
 		result = ProcessDataDirectory("../data/sensors");
 		if (result == false)
@@ -62,18 +72,59 @@ namespace AC_SensorModels
 
 	void Framework::SensorFunction(Sensor* sensor)
 	{
-		bool running = true;
-		int slen = sizeof(sensor->socketAddr);
+		/* Timing variables */
+		INT64 startSampleTime = 0;				/* start of sample frame */
+		INT64 startFrameTime = 0;				/* start of frame */
+		INT64 currentTime = 0;					/* current system time */
+		float frameTime = 0.0f;					/* frame time scaled against frequency */
+		float sampleFrameTime = 0.0f;			/* sample frame time scaled against frequency */
 
+		/* Flow variables */
+		bool running = true;					/* termination flag */
+
+		/* Networking variables */
+		int slen = sizeof(sensor->socketAddr);	/* socket address length */
+
+		/* Get the start time for the first sample frame */
+		QueryPerformanceCounter((LARGE_INTEGER*)&startSampleTime);
+
+		/* Match start times */
+		startFrameTime = startSampleTime;
+
+		/* Run sensor Loop */
 		while (running)
 		{
-			sensor->Frame();
+			/* Get current time */
+			QueryPerformanceCounter((LARGE_INTEGER*)&currentTime);
 
-			if (sendto(sensor->socket, sensor->name, strlen(sensor->name), 0, (struct sockaddr *) &sensor->socketAddr, slen) == SOCKET_ERROR)
+			/* Calculate time difference since last sample frame and scale to frequency */
+			sampleFrameTime = ((float)(currentTime - startSampleTime)) / ticksPerSecond;
+			
+			/* Calculate time difference since last frame and scale to frequency */
+			frameTime = ((float)(currentTime - startFrameTime)) / ticksPerSecond;
+
+			/* Update the sensor model */
+			sensor->Frame(frameTime);
+
+			/* At update rate, send over the network */
+			if (fmod(sampleFrameTime, sensor->samplerate) == 0.0f)
 			{
-				printf("ERROR: sendto() failed with error code : %d", WSAGetLastError());
-				running = false;
+				/* Copy sensor value in to byte array */
+				memcpy(sensor->buffer, &sensor->currentValue, sizeof(sensor->currentValue));
+				
+				/* Send over the network */
+				if (sendto(sensor->socket, sensor->buffer, sizeof(sensor->currentValue), 0, (struct sockaddr *) &sensor->socketAddr, slen) == SOCKET_ERROR)
+				{
+					printf("ERROR: sendto() failed with error code : %d", WSAGetLastError());
+					running = false;
+				}
+
+				/* Update the start sample frame time */
+				startSampleTime = currentTime;
 			}
+
+			/* Update the frame start time */
+			startFrameTime = currentTime;
 		}
 	}
 
@@ -97,20 +148,47 @@ namespace AC_SensorModels
 				tinyxml2::XMLDocument doc;
 				doc.LoadFile(dirFile.path);
 
+				/* Get Sensor element */
+				tinyxml2::XMLElement* sensorElement = doc.FirstChildElement("sensor");
+
 				/* Check to make sure the root tag is sensor */
-				if (doc.FirstChildElement("sensor") != NULL)
+				if (sensorElement != NULL)
 				{
 					/* Sensor config found */
 					Sensor* newSensor = new Sensor();
+
 					/* name */
-					strcpy_s(newSensor->name, doc.FirstChildElement("sensor")->FirstChildElement("name")->GetText());
-					/* ip address */
-					strcpy_s(newSensor->destinationIPAddress, doc.FirstChildElement("sensor")->FirstChildElement("network")->Attribute("ipaddress"));
-					/* ip port */
-					newSensor->destinationPort = atoi(doc.FirstChildElement("sensor")->FirstChildElement("network")->Attribute("port"));
-				
-					/* Add new sensor to framework */
-					_sensors.push_back(newSensor);
+					strcpy_s(newSensor->name, sensorElement->FirstChildElement("name")->GetText());
+
+					/* Check to make sure the sensor is enabled */
+					if (sensorElement->BoolAttribute("enabled") == TRUE)
+					{
+
+						/* Get input element */
+						tinyxml2::XMLElement* inputElement = sensorElement->FirstChildElement("input");
+						/* samplerate */
+						newSensor->samplerate = inputElement->IntAttribute("samplerate");
+
+						/* Get output element */
+						tinyxml2::XMLElement* outputElement = sensorElement->FirstChildElement("output");
+						/* mode */
+						newSensor->outputMode = outputElement->IntAttribute("mode");
+						/* bounds lower limit */
+						newSensor->lowerLimit = outputElement->FirstChildElement("bounds")->FloatAttribute("lower");
+						/* bounds upper limit */
+						newSensor->upperLimit = outputElement->FirstChildElement("bounds")->FloatAttribute("upper");
+
+						/* Get network element */
+						tinyxml2::XMLElement* networkElement = sensorElement->FirstChildElement("network");
+
+						/* ip address */
+						strcpy_s(newSensor->destinationIPAddress, networkElement->Attribute("ipaddress"));
+						/* ip port */
+						newSensor->destinationPort = networkElement->IntAttribute("port");
+
+						/* Add new sensor to framework */
+						_sensors.push_back(newSensor);
+					}
 				}
 			}
 			tinydir_next(&dir);

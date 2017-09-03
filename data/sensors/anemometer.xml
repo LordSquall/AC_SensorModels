@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sensor>
+<sensor enabled="false">
 	<name>Anemometer</name>
-	<input samplerate="10" />
-	
-	<output>
+	<input samplerate="100" />
+		
+	<!-- Modes: CLAMP = 0 | LOOP = 1 | BOUNCE = 2 -->
+	<output mode="0">
 		<bounds lower="0" upper="50000" />
 	</output>
 	
