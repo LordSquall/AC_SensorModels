@@ -100,11 +100,13 @@ namespace AC_SensorModels
 			/* Calculate time difference since last sample frame and scale to frequency */
 			sampleFrameTime = ((float)(currentTime - startSampleTime)) / ticksPerSecond;
 			
+			//printf("SampleFrameTime: %.3f\n", sampleFrameTime / 1000.0f);
 			/* Calculate time difference since last frame and scale to frequency */
 			frameTime = ((float)(currentTime - startFrameTime)) / ticksPerSecond;
 
+			//printf("FrameTime: %.3f\n", frameTime);
 			/* Update the sensor model */
-			sensor->Frame(frameTime);
+			sensor->Frame(sampleFrameTime / 1000.0f);
 
 			/* At update rate, send over the network */
 			if (fmod(sampleFrameTime, sensor->samplerate) == 0.0f)

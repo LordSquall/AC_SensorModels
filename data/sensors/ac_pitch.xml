@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sensor enabled="true">
-	<name>Anemometer</name>
+	<name>AC_ pitch</name>
 	<input samplerate="100" />
-		
+	
 	<!-- Modes: CLAMP = 0 | LOOP = 1 | BOUNCE = 2 -->
-	<output mode="0">
-		<bounds lower="0" upper="2000" />
+	<output mode="2">
+		<bounds lower="-45" upper="45" />
 	</output>
 	
-	<network ipaddress="127.0.0.1" port="8101" />
+	<network ipaddress="127.0.0.1" port="8104" />
 	
 </sensor>

@@ -7,6 +7,9 @@ namespace AC_SensorModels
 		active = true;
 		currentValue = 0.0f;
 
+		speed = 0.5f;
+		startTime = 0.0f;
+
 		bounceDir = true;
 	}
 
@@ -42,8 +45,8 @@ namespace AC_SensorModels
 
 	void Sensor::LoopUpdateBehaviour(float time)
 	{
-		currentValue += time;
-
+		currentValue = lowerLimit + time * (upperLimit - lowerLimit);
+		//intf("currentValue: %.3f\n", time);
 		if (currentValue < lowerLimit)
 		{
 			currentValue = upperLimit;
@@ -56,16 +59,21 @@ namespace AC_SensorModels
 
 	void Sensor::BounceUpdateBehaviour(float time)
 	{
-		if (bounceDir == true)
+		float intpart;
+
+		float lower = lowerLimit;
+		float upper = upperLimit;
+
+		if (bounceDir == false)
 		{
-			currentValue += time;
-		}
-		else
-		{
-			currentValue -= time;
+			lower = upperLimit;
+			upper = lowerLimit;
 		}
 
-		if ((currentValue > upperLimit) || (currentValue < lowerLimit))
+		currentValue = lower + modff((time * 0.25f), &intpart) * (upper - lower);
+		printf("currentValue: %.3f\n", currentValue);
+
+		if ((currentValue > upperLimit-1) || (currentValue < lowerLimit+1))
 		{
 			bounceDir = !bounceDir;
 		}

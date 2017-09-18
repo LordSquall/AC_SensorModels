@@ -38,6 +38,9 @@ namespace AC_SensorModels
 	private:
 		bool bounceDir;
 
+		float speed;
+		float startTime;
+
 	private:
 		void ClampUpdateBehaviour(float time);
 		void LoopUpdateBehaviour(float time);
